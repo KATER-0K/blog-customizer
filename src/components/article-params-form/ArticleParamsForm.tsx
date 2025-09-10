@@ -19,10 +19,10 @@ import {
 	contentWidthArr,
 } from 'src/constants/articleProps';
 
-type ArticleState = typeof defaultArticleState;
-
 import { Select } from 'src/ui/select';
 import { useOutsideClickClose } from 'src/ui/select/hooks/useOutsideClickClose';
+
+type ArticleState = typeof defaultArticleState;
 
 type ArticleParamsFormProps = {
 	formParams: ArticleState;
@@ -39,40 +39,43 @@ export const ArticleParamsForm = ({
 	const [tempSettings, setTempSettings] = useState<ArticleState>(formParams);
 	const [initialSettings, setInitialSettings] =
 		useState<ArticleState>(formParams);
-	const [isOpen, setIsOpen] = useState(false);
+	const [isMenuOpen, setIsMenuOpen] = useState(false);
 	const panelRef = useRef<HTMLDivElement>(null);
 
 	useOutsideClickClose({
-		isOpen: isOpen,
+		isOpen: isMenuOpen,
 		rootRef: panelRef,
-		onChange: () => setIsOpen(false),
+		onChange: () => setIsMenuOpen(false),
 	});
 
 	useEffect(() => {
-		if (isOpen) {
-			setInitialSettings(formParams);
-			setTempSettings(formParams);
-		}
-	}, [isOpen, formParams]);
+		if (!isMenuOpen) return;
+		setInitialSettings(formParams);
+		setTempSettings(formParams);
+	}, [isMenuOpen, formParams]);
 
 	const handleApply = () => {
 		onApply(tempSettings);
-		setIsOpen(false);
+		setIsMenuOpen(false);
 	};
 
 	const handleReset = () => {
 		setTempSettings(initialSettings);
 		onReset();
-		setIsOpen(false);
+		setIsMenuOpen(false);
 	};
 
 	return (
 		<>
-			<ArrowButton isOpen={isOpen} onClick={() => setIsOpen(!isOpen)} />
+			<ArrowButton
+				isOpen={isMenuOpen}
+				onClick={() => setIsMenuOpen(!isMenuOpen)}
+			/>
+
 			<aside
 				ref={panelRef}
 				className={clsx(styles.container, {
-					[styles.container_open]: isOpen,
+					[styles.container_open]: isMenuOpen,
 				})}>
 				<form
 					className={styles.form}
@@ -83,6 +86,7 @@ export const ArticleParamsForm = ({
 					<Text weight={800} size={31} uppercase>
 						Задайте параметры
 					</Text>
+
 					<Select
 						options={fontFamilyOptions}
 						selected={tempSettings.fontFamilyOption}
@@ -91,6 +95,7 @@ export const ArticleParamsForm = ({
 						}
 						title='Шрифт'
 					/>
+
 					<RadioGroup
 						name='fontsize'
 						options={fontSizeOptions}
@@ -100,6 +105,7 @@ export const ArticleParamsForm = ({
 						}
 						title='Размер шрифта'
 					/>
+
 					<Select
 						options={fontColors}
 						selected={tempSettings.fontColor}
@@ -110,6 +116,7 @@ export const ArticleParamsForm = ({
 					/>
 
 					<Separator />
+
 					<Select
 						options={backgroundColors}
 						selected={tempSettings.backgroundColor}
@@ -118,6 +125,7 @@ export const ArticleParamsForm = ({
 						}
 						title='Цвет фона'
 					/>
+
 					<Select
 						options={contentWidthArr}
 						selected={tempSettings.contentWidth}
